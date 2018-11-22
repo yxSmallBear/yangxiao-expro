@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+       
+    <meta charset="UTF-8">
+       
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+       
+</head>
+<body>
+    <!-- autoplay   自动播放 -->
+   
+<audio class="au" src="music/2.mp3" controls></audio>
+   
+<script>
+    var audio = document.querySelector('.au')
+    var timer;
+    var precent;
+
+    function play() {
+        audio.play()
+        document.querySelector('.play').classList.add('display-none')
+        document.querySelector('.pause').classList.remove('display-none')
+        document.querySelector('.total').innerHTML = countTime(audio.duration)
+        timer = setInterval(function () {
+            // console.log(audio.currentTime)   当前播放时长
+            document.querySelector('.current').innerHTML = countTime(audio.currentTime)
+            document.querySelector('.circle').style.left = ((audio.currentTime / audio.duration) * 400) + 'px'
+            document.querySelector('.process-played').style.width = ((audio.currentTime / audio.duration) * 400) + 'px'
+        }, 1000)
+    }
+
+    function pause() {
+        audio.pause()
+        clearInterval(timer)
+        document.querySelector('.play').classList.remove('display-none')
+        document.querySelector('.pause').classList.add('display-none')
+
+    }
+
+
+    // 把秒数转换成为 有分钟的时间
+    function countTime(time) {
+        var minutes = Math.floor(time / 60)
+        var seconds = Math.floor(time % 60) + 1
+        if (seconds < 10) {
+            seconds = '0' + seconds  //如果秒小于10，前面加个0
+        }
+        if (minutes < 10) {
+            minutes = '0' + minutes  //如果分钟小于10，前面加个0
+        }
+        return minutes + ':' + seconds
+    }
+
+
+    function start(e) {
+        document.body.onmousemove = function () {
+            e = window.event || e
+            move(e)
+        }
+    }     //兼容IE和谷歌、火狐浏览器
+
+
+    function move(e) {
+        var ml = e.clientX      // 鼠标距离浏览器左边的值
+        // 如果鼠标距离浏览器左边的值  小于  控制点所能到达的最左边  那么控制点的left为0
+        var process_left = document.getElementsByClassName('process')[0].clientLeft + 50;
+        if (ml < process_left) {
+            document.querySelector('.circle').style.left = '0px'
+            precent = 0;
+            // 如果鼠标距离浏览器左边的值  大于 控制点所能到达的最右边  那么控制点的left值为400
+        } else if (ml > (document.querySelector('.process-background').clientWidth) + 50) {
+            document.querySelector('.circle').style.left = '400px'
+            precent = 1;
+        } else {
+            // 鼠标在进度条的范围内移动   控制点的left值  就等于  鼠标距离浏览器的左边的值 - 控制点所能到达的最左边
+            document.querySelector('.circle').style.left = (ml - 50) + 'px'
+            precent = (ml - 50) / 400
+        }
+        document.body.onmouseup = function () {
+            end();
+        }
+    }
+
+    function end() {
+        document.body.onmousemove = null;
+        // 播放器当前播放时间  = （控制点的left值  总宽度） * 播放总时长
+        audio.currentTime = precent * audio.duration
+    }
+
+    // 当播放器播放完毕 执行的回调函数
+    audio.onended = function () {
+        console.log(1111)     //这个功能仅打印测试，有想实现的小伙伴自行测试一下~
+    }
+
+
+    // 当前播放时长          控制点的left值
+    // ————————————    =    —————————————
+    // 总播放时长              总宽度
+
+
+</script>
+</body>
+</html>
